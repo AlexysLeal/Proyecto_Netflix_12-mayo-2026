@@ -1,721 +1,159 @@
-🎥 Master Blueprint: Streaming Platform "Netflix Clone"
-Stack: Flutter (UI/Logic), Firebase (Backend/Auth), Provider (State), Cloud Storage (CDN).
+¡Entendido! Aquí tienes el **Plan de Ejecución Maestro** completo y detallado para tu aplicación tipo "Netflix". Este documento servirá como tu hoja de ruta técnica definitiva, desde el primer comando en la terminal hasta el despliegue en tiendas.
 
-🏗️ Fase 1: Ingeniería de Infraestructura y Gobernanza de Código
-Antes de escribir void main(), establecemos las reglas del juego.
+---
 
-1.1. Gestión de Entornos (Multi-flavoring)
-Configuración de Flavors: Crear esquemas separados para development, staging y production. Esto permite tener una base de datos de prueba y una real sin riesgo de borrar datos de usuarios finales.
+# 🎥 Master Implementation Plan: Netflix Clone (Flutter + Firebase)
 
-FVM (Flutter Version Management): Fijar la versión del SDK (ej: 3.x.x) para evitar que actualizaciones futuras del framework rompan el código.
+## 🏗️ Fase 1: Arquitectura de Software y Entorno
 
-Dart Defines: Manejo de llaves de API y configuraciones sensibles mediante archivos .json o variables de entorno no rastreadas en Git.
+*Objetivo: Crear una base sólida, escalable y libre de errores estructurales.*
 
-1.2. Estandarización de Calidad (Linter & Git)
-Linter Custom: Implementar un archivo analysis_options.yaml con reglas de "pedantic" o "flutter_lints" pero endurecidas (ej: forzar el uso de final en variables inmutables).
+1. **Configuración del Entorno de Desarrollo:**
+* Instalación de **FVM** (Flutter Version Management) para fijar la versión del SDK.
+* Configuración de `analysis_options.yaml` con reglas estrictas de linter para evitar código "sucio".
 
-Husky & Pre-commit Hooks: Configurar scripts que impidan hacer un "Commit" si el código tiene errores de formato o tests fallidos.
 
-🎨 Fase 2: Arquitectura de Software (The Clean Architecture)
-No basta con carpetas; necesitamos una estructura que soporte millones de datos.
+2. **Estructura de Carpetas (Clean Architecture):**
+* `lib/core/`: Constantes, temas, errores (`failures.dart`) y utilidades de red.
+* `lib/features/`: Una carpeta por funcionalidad (auth, media_player, home, search, profile).
+* Cada feature tendrá: `data/` (modelos y repositorios), `domain/` (entidades y casos de uso) y `presentation/` (widgets y providers).
 
-2.1. Desglose de Capas (Domain, Data, Presentation)
-Capa Domain (El Corazón):
 
-Entities: Modelos de datos puros (Ej: Movie, User).
 
-Use Cases: Acciones específicas (Ej: GetTrendingMovies, AddToWatchlist).
 
-Failures: Manejo estandarizado de errores (Ej: ServerFailure, NoNetworkFailure).
+3. **Inyección de Dependencias:**
+* Configuración de `get_it` para gestionar instancias globales (Firebase, Repositorios, Servicios).
 
-Capa Data (Los Datos):
 
-Repositories Implementation: Lógica para decidir si los datos vienen de Firestore o de la caché local.
 
-Data Sources: Clases que hablan directamente con Firebase o con el almacenamiento local (Hive/SharedPrefs).
+---
 
-DTOs (Models): Clases con métodos fromMap y toMap para Firebase.
+## 🎨 Fase 2: UI/UX y Sistema de Diseño (Design System)
 
-Capa Presentation (La UI):
+*Objetivo: Replicar la experiencia premium de una plataforma de streaming.*
 
-Providers (ViewModels): Manejo de estados complejos.
+1. **Fundamentos Visuales:**
+* Paleta de colores: `Deep Black (#000000)`, `Netflix Red (#E50914)`, `Dark Gray (#121212)`.
+* Tipografía: Configuración de `Google Fonts (Bebas Neue para títulos, Montserrat para cuerpo)`.
 
-Pages & Widgets: Solo pintura y detección de gestos.
 
-🔐 Fase 3: Seguridad de Identidad y Acceso (IAM)
-Blindaje contra accesos no autorizados.
+2. **Componentes Atómicos Reutilizables:**
+* `NetflixButton`: Estilizado para acciones primarias y secundarias.
+* `ContentCard`: Tarjeta con efecto de elevación y bordes redondeados.
+* `SkeletonLoader`: Efectos Shimmer para carga de datos.
 
-3.1. Firebase Auth de Alto Nivel
-OAuth Integrado: Implementación nativa para Google, Apple ID y Facebook.
 
-Análisis de Seguridad: Implementación de Firebase App Check para asegurar que solo TU aplicación pueda hacer peticiones a tu base de datos (bloqueando bots y scripts externos).
+3. **Navegación Dinámica:**
+* Implementación de `GoRouter` con `CustomTransitionPage` para transiciones cinematográficas entre pantallas.
 
-State Persistence: Lógica de "Silently Sign In" para que el usuario nunca vea la pantalla de login si su token sigue vigente.
 
-🗄️ Fase 4: Estrategia de Persistencia y Big Data (Cloud)
-Optimización de costos y velocidad de carga.
 
-4.1. Firestore (Estructura NoSQL Avanzada)
-Denormalización: Duplicar datos estratégicamente para evitar múltiples lecturas (ej: guardar el nombre del género dentro del objeto película).
+---
 
-Índices Compuestos: Configuración manual de índices para permitir filtros complejos (ej: "Películas de Acción" + "Rating > 8" + "Año 2024").
+## 🔐 Fase 3: Autenticación y Capa de Seguridad
 
-TTL (Time To Live): Configurar borrado automático de logs o notificaciones viejas para ahorrar espacio.
+*Objetivo: Gestionar usuarios y proteger el acceso al contenido.*
 
-4.2. Cloud Storage & Content Delivery
-CDN (Content Delivery Network): Uso de URLs firmadas para trailers y assets pesados.
+1. **Firebase Auth Integration:**
+* Flujos de: Registro, Login, Reset de Password.
+* Implementación de **Persistence Layer**: Uso de `flutter_secure_storage` para guardar el estado de la sesión localmente.
 
-Image Compression: Implementación de un microservicio o lógica en Firebase Functions para redimensionar posters de películas en la nube y ahorrar ancho de banda al usuario.
 
-🔄 Fase 5: Gestión de Estado Reactiva (Provider)
-Fluidez total en la interfaz.
+2. **Auth Guard (Protección de Rutas):**
+* Middleware que redirige automáticamente al Login si el token de Firebase ha expirado o no existe.
 
-5.1. Multi-Provider & Optimización
-ProxyProvider: Para inyectar dependencias (ej: que el WatchlistProvider sepa automáticamente qué usuario está logueado en el AuthProvider).
 
-ChangeNotifier vs ValueNotifier: Usar ValueNotifier para estados simples (como el volumen del reproductor) para reducir la carga de CPU.
 
-Rebuild Control: Uso extensivo de Consumer y Selector para que al darle "Like" a una película, no se redibuje toda la pantalla principal.
+---
 
-📱 Fase 6: Experiencia de Usuario y Multimedia
-Donde ocurre la "magia" de Netflix.
+## 🗄️ Fase 4: Modelado de Datos y Backend (Firestore)
 
-6.1. El Reproductor de Video Pro
-Buffer Management: Configuración del tamaño del buffer para evitar interrupciones en conexiones lentas.
+*Objetivo: Estructurar la base de datos para eficiencia en costos y velocidad.*
 
-Custom UI: Controles personalizados sobre el video (brillo, volumen con gestos, selector de subtítulos y audio).
+1. **Esquema de Colecciones:**
+* `movies`: `{ id, title, description, thumbnail_url, video_url, category_id, release_year, rating, cast: [] }`.
+* `categories`: `{ id, name, priority_order }`.
+* `user_profiles`: `{ uid, name, avatar_url, watch_list: [], history: [] }`.
 
-Background Playback: Configuración de servicios en segundo plano y notificaciones multimedia (MediaStyle).
 
-6.2. UI Adaptativa y Animaciones
-Sliver Ecosystem: Uso de SliverAppBar con efectos de colapso y SliverGrid para un scroll infinito suave a 60/120 FPS.
+2. **Optimización de Consultas:**
+* Creación de índices compuestos en Firebase para permitir filtros por categoría y año simultáneamente.
+* Implementación de **Pagination (Limit/StartAfter)** para no cargar todas las películas de golpe.
 
-Hero Animations: Transiciones fluidas entre el poster de la película en el Home y la imagen principal en la pantalla de Detalle.
 
-🧪 Fase 7: Calidad (QA), Testing y Profiling
-Garantizar que la app no falle en el lanzamiento.
 
-7.1. Suite de Pruebas
-Golden Tests: Pruebas visuales para asegurar que la UI no cambie accidentalmente píxel por píxel.
+---
 
-Integration Testing (Patrol): Usar herramientas como Patrol para probar flujos reales (abrir la app, loguearse, dar play).
-
-7.2. Monitorización en Tiempo Real
-Firebase Crashlytics: Reporte automático de errores con trazas de pila completas.
-
-Performance Monitoring: Medir el tiempo de renderizado de cada pantalla y la latencia de las llamadas a Firestore.
-
-🚀 Fase 8: Ciclo de Vida de Lanzamiento (DevOps)
-Publicación y escalado.
-
-8.1. CI/CD Pipeline (GitHub Actions / Codemagic)
-Automated Build: Generar el .aab (Android) y .ipa (iOS) automáticamente al hacer un merge a la rama main.
-
-Automated Release: Subir directamente a Google Play Console (Internal Track) y TestFlight.
-
-8.2. Mantenimiento y Crecimiento
-Remote Config: Capacidad de cambiar el color del botón o habilitar/deshabilitar funciones sin subir una nueva versión a la tienda.
-
-A/B Testing: Probar dos versiones del Home para ver cuál genera más reproducciones.
-
-Estatus del Plan: Este documento es ahora una guía completa de ingeniería. No hay código aún, solo lógica arquitectónica pura.
-
-¿Aprobado? Si es así, dime por cuál de estos puntos específicos quieres que comencemos la generación de código inicial:
-
-Setup Técnico: pubspec.yaml profesional y estructura de carpetas core/data/domain.
-
-Base de Datos: Modelos DTO y Repositorios para content.
-
-Sistema de Auth: Lógica del AuthProvider y Firebase Auth.
-Fase 1: Configuración de Infraestructura (Estructura de Archivos)
-Primero, organizamos el proyecto bajo Clean Architecture. Ejecuta estos comandos en tu terminal dentro de la carpeta del proyecto para crear la estructura:
-
-Bash
-# Crear estructura de capas por funcionalidad (Feature-driven)
-mkdir -p lib/core/{constants,theme,utils,errors}
-mkdir -p lib/features/auth/{data,domain,presentation}
-mkdir -p lib/features/content/{data,domain,presentation}
-mkdir -p lib/features/home/presentation/widgets
-mkdir -p lib/shared/widgets
-📦 Fase 2: Dependencias Profesionales (pubspec.yaml)
-Copia esta configuración en tu pubspec.yaml. He incluido las versiones que garantizan compatibilidad para una app de streaming:
-
-YAML
-name: netflix_clone
-description: A professional streaming app with Flutter and Firebase.
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-  
-  # Firebase & Backend
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_storage: ^11.5.6
-
-  # Gestión de Estado & Inyección
-  provider: ^6.1.1
-
-  # UI & Media
-  cached_network_image: ^3.3.0
-  google_fonts: ^6.1.0
-  video_player: ^2.8.1
-  chewie: ^1.7.1 # Reproductor con controles pro
-  flutter_spinkit: ^5.2.0 # Loaders elegantes
-
-  # Utilidades
-  dartz: ^0.10.1 # Para manejo de errores funcionales (Either)
-  equatable: ^2.0.5 # Comparación de objetos sin boilerplate
-  intl: ^0.19.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.1
-🔐 Fase 3: Capa de Dominio - El Modelo de Datos (domain)
-Definimos nuestra Entidad de película. Es una clase pura que no depende de Firebase, lo que permite probar la lógica de negocio sin conexión a internet.
-
-Archivo: lib/features/content/domain/entities/content_entity.dart
-
-Dart
-import 'package:equatable/equatable.dart';
-
-class ContentEntity extends Equatable {
-  final String id;
-  final String title;
-  final String description;
-  final String posterUrl;
-  final String backdropUrl;
-  final String videoUrl;
-  final String category;
-  final double rating;
-  final int releaseYear;
-
-  const ContentEntity({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.posterUrl,
-    required this.backdropUrl,
-    required this.videoUrl,
-    required this.category,
-    required this.rating,
-    required this.releaseYear,
-  });
-
-  @override
-  List<Object?> get props => [id, title, videoUrl];
-}
-🔄 Fase 4: Gestión de Estado de Autenticación (presentation)
-Implementamos el AuthProvider. Este maneja el flujo de Firebase y notifica a la UI para cambiar de pantalla automáticamente.
-
-Archivo: lib/features/auth/presentation/providers/auth_provider.dart
-
-Dart
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-
-enum AuthStatus { authenticated, unauthenticated, authenticating }
-
-class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  AuthStatus _status = AuthStatus.unauthenticated;
-  User? _user;
-
-  AuthStatus get status => _status;
-  User? get user => _user;
-
-  AuthProvider() {
-    // Escucha cambios en la sesión de Firebase en tiempo real
-    _auth.authStateChanges().listen(_onAuthStateChanged);
-  }
-
-  Future<void> _onAuthStateChanged(User? user) async {
-    if (user == null) {
-      _status = AuthStatus.unauthenticated;
-    } else {
-      _user = user;
-      _status = AuthStatus.authenticated;
-    }
-    notifyListeners();
-  }
-
-  Future<bool> login(String email, String password) async {
-    try {
-      _status = AuthStatus.authenticating;
-      notifyListeners();
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return true;
-    } catch (e) {
-      _status = AuthStatus.unauthenticated;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<void> logout() async {
-    await _auth.signOut();
-  }
-}
-🎨 Fase 5: El Punto de Entrada (main.dart)
-Configuramos el MultiProvider y el tema visual oscuro (estilo Netflix).
-
-Archivo: lib/main.dart
-
-Dart
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
-import 'features/auth/presentation/providers/auth_provider.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Asegúrate de tener configurado Firebase Console
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Netflix Clone Pro',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          primaryColor: Colors.red,
-          scaffoldBackgroundColor: Colors.black,
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFE50914), // Rojo Netflix
-            secondary: Colors.white,
-          ),
-        ),
-        home: const AuthWrapper(),
-      ),
-    );
-  }
-}
-
-// Decide si mostrar Login o el Home
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-
-    if (authProvider.status == AuthStatus.authenticating) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    
-    // Aquí retornarás tu Home o Login según el estado
-    return Scaffold(
-      body: Center(
-        child: Text(authProvider.status == AuthStatus.authenticated 
-          ? "Bienvenido al Home" 
-          1. Modelo de Datos (DTO)
-El Data Transfer Object (DTO) es el encargado de convertir los datos brutos de Firebase en objetos que Flutter entienda.
-
-Archivo: lib/features/content/data/models/content_model.dart
-
-Dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../domain/entities/content_entity.dart';
-
-class ContentModel extends ContentEntity {
-  const ContentModel({
-    required super.id,
-    required super.title,
-    required super.description,
-    required super.posterUrl,
-    required super.backdropUrl,
-    required super.videoUrl,
-    required super.category,
-    required super.rating,
-    required super.releaseYear,
-  });
-
-  // Convierte un documento de Firestore a nuestro modelo
-  factory ContentModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return ContentModel(
-      id: doc.id,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      posterUrl: data['posterUrl'] ?? '',
-      backdropUrl: data['backdropUrl'] ?? '',
-      videoUrl: data['videoUrl'] ?? '',
-      category: data['category'] ?? 'General',
-      rating: (data['rating'] ?? 0.0).toDouble(),
-      releaseYear: data['releaseYear'] ?? 2024,
-    );
-  }
-
-  // Convierte nuestro modelo a un mapa para subir a Firestore si fuera necesario
-  Map<String, dynamic> toFirestore() {
-    return {
-      'title': title,
-      'description': description,
-      'posterUrl': posterUrl,
-      'backdropUrl': backdropUrl,
-      'videoUrl': videoUrl,
-      'category': category,
-      'rating': rating,
-      'releaseYear': releaseYear,
-    };
-  }
-}
-2. Repositorio de Contenido
-El repositorio es el "contrato" y su implementación. Aquí definimos cómo obtener las películas.
-
-Archivo: lib/features/content/data/repositories/content_repository.dart
-
-Dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/content_model.dart';
-import '../../domain/entities/content_entity.dart';
-
-class ContentRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // Obtiene todas las películas organizadas por una categoría específica
-  Future<List<ContentEntity>> getMoviesByCategory(String category) async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('movies')
-          .where('category', isEqualTo: category)
-          .orderBy('releaseYear', descending: true)
-          .get();
-
-      return querySnapshot.docs
-          .map((doc) => ContentModel.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      print("Error cargando categoría $category: $e");
-      return [];
-    }
-  }
-
-  // Obtiene las películas en tendencia (Trending)
-  Future<List<ContentEntity>> getTrendingMovies() async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('movies')
-          .where('rating', isGreaterThan: 7.5)
-          .limit(10)
-          .get();
-
-      return querySnapshot.docs
-          .map((doc) => ContentModel.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      return [];
-    }
-  }
-}
-3. El Content Provider
-Este es el "cerebro" que conectará la UI con los datos. Usaremos este Provider para llenar los carruseles del Home.
-
-Archivo: lib/features/content/presentation/providers/content_provider.dart
-
-Dart
-import 'package:flutter/material.dart';
-import '../../domain/entities/content_entity.dart';
-import '../../data/repositories/content_repository.dart';
-
-class ContentProvider with ChangeNotifier {
-  final ContentRepository _repository = ContentRepository();
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  // Listas para diferentes secciones del Home
-  List<ContentEntity> _trending = [];
-  List<ContentEntity> _actionMovies = [];
-  List<ContentEntity> _series = [];
-
-  List<ContentEntity> get trending => _trending;
-  List<ContentEntity> get actionMovies => _actionMovies;
-  List<ContentEntity> get series => _series;
-
-  // Método principal para cargar toda la data del Home de una vez
-  Future<void> loadHomeContent() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Ejecutamos las peticiones en paralelo para mayor velocidad
-      final results = await Future.wait([
-        _repository.getTrendingMovies(),
-        _repository.getMoviesByCategory('Acción'),
-        _repository.getMoviesByCategory('Series'),
-      ]);
-
-      _trending = results[0];
-      _actionMovies = results[1];
-      _series = results[2];
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-}
-4. Actualización del main.dart
-No olvides registrar este nuevo Provider para que toda la app tenga acceso a los datos.
-
-Dart
-// Dentro de tu MultiProvider en lib/main.dart
-providers: [
-  ChangeNotifierProvider(create: (_) => AuthProvider()),
-  ChangeNotifierProvider(create: (_) => ContentProvider()), // <--- NUEVO
-],
-          : "Pantalla de Login"),
-      ),
-    );
-  }
-}
-Widget de Tarjeta de Contenido (MovieCard)
-Este componente se encarga de mostrar el póster con bordes redondeados y una transición suave al cargar la imagen.
-
-Archivo: lib/features/home/presentation/widgets/movie_card.dart
-
-Dart
-import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../../content/domain/entities/content_entity.dart';
-
-class MovieCard extends StatelessWidget {
-  final ContentEntity movie;
-
-  const MovieCard({super.key, required this.movie});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navegación al detalle (implementaremos luego)
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        width: 130,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: CachedNetwork_image(
-            imageUrl: movie.posterUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: Colors.grey[900]),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-        ),
-      ),
-    );
-  }
-}
-2. Carrusel Horizontal por Categoría (ContentSection)
-Un widget genérico para mostrar "Tendencias", "Acción", etc.
-
-Archivo: lib/features/home/presentation/widgets/content_section.dart
-
-Dart
-import 'package:flutter/material.dart';
-import '../../../content/domain/entities/content_entity.dart';
-import 'movie_card.dart';
-
-class ContentSection extends StatelessWidget {
-  final String title;
-  final List<ContentEntity> contentList;
-
-  const ContentSection({
-    super.key, 
-    required this.title, 
-    required this.contentList
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (contentList.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, top: 20, bottom: 10),
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: contentList.length,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            itemBuilder: (context, index) => MovieCard(movie: contentList[index]),
-          ),
-        ),
-      ],
-    );
-  }
-}
-3. Pantalla Principal (HomeScreen)
-Aquí unimos todo usando CustomScrollView para el efecto de la barra superior y conectamos con el ContentProvider.
-
-Archivo: lib/features/home/presentation/pages/home_page.dart
-
-Dart
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../content/presentation/providers/content_provider.dart';
-import '../widgets/content_section.dart';
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // Cargamos los datos al iniciar la pantalla
-    Future.microtask(
-      () => context.read<ContentProvider>().loadHomeContent(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final contentProv = context.watch<ContentProvider>();
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: contentProv.isLoading 
-        ? const Center(child: CircularProgressIndicator(color: Colors.red))
-        : CustomScrollView(
-            slivers: [
-              // Barra superior estilo Netflix
-              const SliverAppBar(
-                backgroundColor: Colors.transparent,
-                floating: true,
-                leading: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Image(image: AssetImage('assets/logo_n.png'), errorBuilder: (_,__,___) => Icon(Icons.movie, color: Colors.red)),
-                ),
-                actions: [
-                  IconButton(icon: Icon(Icons.search, size: 30), onPressed: null),
-                  IconButton(icon: Icon(Icons.person, size: 30), onPressed: null),
-                ],
-              ),
-
-              // Carrusel Destacado (Feature)
-              SliverToBoxAdapter(
-                child: _HeaderFeatured(movie: contentProv.trending.firstOrNull),
-              ),
-
-              // Secciones de contenido
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  ContentSection(title: "Tendencias ahora", contentList: contentProv.trending),
-                  ContentSection(title: "Películas de Acción", contentList: contentProv.actionMovies),
-                  ContentSection(title: "Series Originales", contentList: contentProv.series),
-                  const SizedBox(height: 50),
-                ]),
-              ),
-            ],
-          ),
-    );
-  }
-}
-
-// Widget para la película destacada principal
-class _HeaderFeatured extends StatelessWidget {
-  final dynamic movie; // Podrías tiparlo como ContentEntity
-  const _HeaderFeatured({this.movie});
-
-  @override
-  Widget build(BuildContext context) {
-    if (movie == null) return const SizedBox(height: 400);
-
-    return Stack(
-      children: [
-        Container(
-          height: 500,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(movie.backdropUrl),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        // Gradiente para que el texto se lea y se funda con el fondo negro
-        Container(
-          height: 500,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.black, Colors.transparent, Colors.black],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 20,
-          left: 0,
-          right: 0,
-          child: Column(
-            children: [
-              Text(movie.title, style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _ActionButton(icon: Icons.add, label: "Mi lista"),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
-                    icon: const Icon(Icons.play_arrow, size: 30),
-                    label: const Text("Reproducir", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  ),
-                  _ActionButton(icon: Icons.info_outline, label: "Información"),
-                ],
-              )
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _ActionButton({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 28),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-      ],
-    );
-  }
-}
+## 🔄 Fase 5: Gestión de Estado (Provider Strategy)
+
+*Objetivo: Reactividad total sin sobrecargar la memoria.*
+
+1. **MovieProvider:** Manejo de listas de tendencias, populares y por categoría.
+2. **PlayerProvider:** Control del estado del video (volumen, posición actual, pantalla completa).
+3. **SearchProvider:** Lógica de búsqueda con **Debounce** (esperar 500ms tras escribir para lanzar la petición a Firestore).
+
+---
+
+## 🎬 Fase 6: Módulo de Video y Streaming (Core Feature)
+
+*Objetivo: Reproducción fluida y controles intuitivos.*
+
+1. **Motor de Video:**
+* Uso de `video_player` con `chewie` para una interfaz de usuario de reproductor profesional.
+
+
+2. **Gestión de Pantalla:**
+* Uso de `wakelock_plus` para que la pantalla no se apague durante el streaming.
+* Cambio forzado de orientación a **Landscape** al iniciar el video.
+
+
+3. **Bookmark System:**
+* Guardado automático del segundo exacto donde el usuario dejó de ver el video para reanudar después.
+
+
+
+---
+
+## 🧪 Fase 7: Calidad, Testing y Performance
+
+*Objetivo: Cero crashes y alta velocidad.*
+
+1. **Optimización de Imágenes:**
+* Uso de `cached_network_image` con redimensionamiento dinámico (memCacheWidth/Height).
+
+
+2. **Pruebas de Estrés:**
+* **Widget Testing:** Verificar que los botones y carruseles respondan correctamente.
+* **Integration Testing:** Simular un flujo completo desde el Login hasta la reproducción de un trailer.
+
+
+3. **Monitoreo de Errores:**
+* Vinculación con **Firebase Crashlytics** para recibir reportes de errores en tiempo real.
+
+
+
+---
+
+## 🚀 Fase 8: Deployment y Ciclo de Vida
+
+*Objetivo: Publicación y mantenimiento profesional.*
+
+1. **Preparación de Assets:**
+* Generación de iconos adaptativos para Android e iOS.
+* Configuración de la **Splash Screen** nativa (flutter_native_splash).
+
+
+2. **Automatización (CI/CD):**
+* Script de compilación: `flutter build appbundle --release --obfuscate --split-debug-info`.
+
+
+3. **Lanzamiento:**
+* Subida a **Google Play Console** y **Apple App Store Connect**.
+* Configuración de **Firebase Remote Config** para cambiar banners o anuncios en la app sin necesidad de actualizarla en la tienda.
+
+
+
+---
+
+> **Estado del Plan:** LISTO PARA EJECUCIÓN.
+> **Próximo Paso Sugerido:** Iniciar con la creación del proyecto y la estructura de carpetas de la Fase 1.
