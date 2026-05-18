@@ -1,4 +1,5 @@
 Fase 1 y fase 2
+
 <img width="492" height="731" alt="image" src="https://github.com/user-attachments/assets/84bec1e9-1da1-4d2c-acf3-4b7e7fd481a5" />
 Fase 3,4 y 5
 <img width="1199" height="1312" alt="image" src="https://github.com/user-attachments/assets/1f547a0c-cdf8-49d2-b383-4eef407ac888" />
