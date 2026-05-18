@@ -1,6 +1,7 @@
 Fase 1 y fase 2
 
-<img width="492" height="731" alt="image" src="https://github.com/user-attachments/assets/84bec1e9-1da1-4d2c-acf3-4b7e7fd481a5" />
+<img width="1216" height="1294" alt="image" src="https://github.com/user-attachments/assets/1e045b3c-8e43-408d-b58f-e573b84b1df0" />
+
 
 Fase 3,4 y 5
 
