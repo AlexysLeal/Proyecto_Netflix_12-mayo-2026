@@ -1,4 +1,4 @@
-Fase 1 y fase 2
+Fase 1 etapa inicial de mi proyecto y fase 2
 
 <img width="1216" height="1294" alt="image" src="https://github.com/user-attachments/assets/1e045b3c-8e43-408d-b58f-e573b84b1df0" />
 
